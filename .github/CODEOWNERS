@@ -1,0 +1,7 @@
+# Require repository owner review for all production-relevant changes.
+* @ChristineJanischek
+
+.github/workflows/* @ChristineJanischek
+docker-compose.yml @ChristineJanischek
+src/** @ChristineJanischek
+tests/live/** @ChristineJanischek

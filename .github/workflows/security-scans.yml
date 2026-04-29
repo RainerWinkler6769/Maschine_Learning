@@ -1,0 +1,101 @@
+name: Security Scans
+
+on:
+  push:
+    branches: ["main"]
+  pull_request:
+
+permissions:
+  contents: read
+  security-events: write
+
+jobs:
+  filesystem-scan:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Trivy filesystem scan (fail on HIGH/CRITICAL)
+        uses: aquasecurity/trivy-action@0.24.0
+        with:
+          scan-type: fs
+          scan-ref: .
+          severity: HIGH,CRITICAL
+          ignore-unfixed: true
+          format: table
+          exit-code: 1
+
+  dependency-scan-python:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install pip-audit
+        run: python -m pip install --upgrade pip pip-audit
+
+      - name: Audit Python dependencies
+        run: pip-audit -r src/python-api/requirements.txt
+
+  image-scan:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Prepare environment
+        run: |
+          cp .env.example .env
+          sed -i 's/CHANGE_ME_ROOT_PASSWORD_MIN_16/SuperSicherRootPass123!/g' .env
+          sed -i 's/CHANGE_ME_APP_PASSWORD_MIN_16/SuperSicherAppPass123!/g' .env
+
+      - name: Build images
+        run: docker compose build
+
+      - name: Trivy image scan python-api
+        uses: aquasecurity/trivy-action@0.24.0
+        with:
+          image-ref: edu-code-course-ml-python-api:latest
+          severity: HIGH,CRITICAL
+          ignore-unfixed: true
+          format: table
+          exit-code: 1
+
+      - name: Trivy image scan php-web
+        uses: aquasecurity/trivy-action@0.24.0
+        with:
+          image-ref: edu-code-course-ml-php-web:latest
+          severity: HIGH,CRITICAL
+          ignore-unfixed: true
+          format: table
+          exit-code: 1
+
+      - name: Trivy image scan js-web
+        uses: aquasecurity/trivy-action@0.24.0
+        with:
+          image-ref: edu-code-course-ml-js-web:latest
+          severity: HIGH,CRITICAL
+          ignore-unfixed: true
+          format: table
+          exit-code: 1
+
+      - name: Trivy image scan java-app
+        uses: aquasecurity/trivy-action@0.24.0
+        with:
+          image-ref: edu-code-course-ml-java-app:latest
+          severity: HIGH,CRITICAL
+          ignore-unfixed: true
+          format: table
+          exit-code: 1
+
+      - name: Cleanup
+        if: always()
+        run: |
+          docker compose down -v || true
+          rm -f .env

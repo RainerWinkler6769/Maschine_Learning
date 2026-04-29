@@ -1,0 +1,16 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+if [[ "${CI:-false}" == "true" ]] || [[ "${BYPASS_APPROVAL_HOOKS:-0}" == "1" ]]; then
+  exit 0
+fi
+
+repo_root="$(git rev-parse --show-toplevel)"
+validator="$repo_root/scripts/git/approval.sh"
+
+if [[ ! -x "$validator" ]]; then
+  echo "[pre-commit] Fehler: $validator fehlt oder ist nicht ausfuehrbar." >&2
+  exit 1
+fi
+
+"$validator" validate commit

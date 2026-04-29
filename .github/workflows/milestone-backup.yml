@@ -1,0 +1,60 @@
+name: Milestone Backup
+
+on:
+  push:
+    branches:
+      - main
+    tags:
+      - "v*"
+      - "milestone-*"
+  workflow_dispatch:
+    inputs:
+      milestone_name:
+        description: "Meilensteinbezeichnung fuer den Backup-Lauf"
+        required: false
+        default: "manual"
+  schedule:
+    - cron: "0 3 * * 1"
+
+permissions:
+  contents: read
+
+defaults:
+  run:
+    shell: bash
+
+jobs:
+  create-backup:
+    name: Create Milestone Backup
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout full history
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Select milestone label
+        id: milestone
+        run: |
+          if [[ "${{ github.event_name }}" == "workflow_dispatch" ]]; then
+            label="${{ inputs.milestone_name }}"
+          elif [[ "${GITHUB_REF}" == refs/tags/* ]]; then
+            label="${{ github.ref_name }}"
+          else
+            label="main-${{ github.run_number }}"
+          fi
+
+          echo "label=$label" >> "$GITHUB_OUTPUT"
+
+      - name: Generate backup bundle
+        run: |
+          chmod +x scripts/git/create-milestone-backup.sh
+          scripts/git/create-milestone-backup.sh "${{ steps.milestone.outputs.label }}"
+
+      - name: Upload backup artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: milestone-backup-${{ steps.milestone.outputs.label }}-${{ github.run_number }}
+          path: backups/milestones/*.tar.gz
+          retention-days: 180

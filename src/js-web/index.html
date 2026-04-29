@@ -1,0 +1,72 @@
+<!doctype html>
+<html lang="de">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>E-Learning Testversion</title>
+    <link rel="stylesheet" href="style.css" />
+  </head>
+  <body>
+    <header id="app-banner" class="banner">
+      <div class="banner-logo-wrap">
+        <img id="school-logo" class="banner-logo" alt="Schullogo" src="" />
+      </div>
+      <div class="banner-content">
+        <h1 id="message">Hallo Welt aus JavaScript</h1>
+        <p id="banner-subtitle">E-Learning Studio - Schuelerzentriert und testbar</p>
+      </div>
+    </header>
+
+    <main class="layout">
+      <aside class="panel panel-settings">
+        <h2>Layout Konfiguration</h2>
+        <label for="school-name-input">Schulname</label>
+        <input id="school-name-input" type="text" placeholder="z. B. Edu Gymnasium" />
+
+        <label for="logo-url-input">Schullogo URL</label>
+        <input id="logo-url-input" type="url" placeholder="https://.../logo.png" />
+
+        <label for="heading-color-input">Schriftfarbe Ueberschrift</label>
+        <input id="heading-color-input" type="color" value="#fff7f0" />
+
+        <label for="body-color-input">Schriftfarbe Text</label>
+        <input id="body-color-input" type="color" value="#3a2118" />
+
+        <label for="accent-1-input">Kaminrot</label>
+        <input id="accent-1-input" type="color" value="#8f2d1f" />
+
+        <label for="accent-2-input">Orange warm</label>
+        <input id="accent-2-input" type="color" value="#f08c1a" />
+
+        <button id="save-settings-btn" class="btn">Layout speichern</button>
+      </aside>
+
+      <section class="panel panel-task">
+        <div class="task-head">
+          <h2 id="task-title">Aufgabe wird geladen...</h2>
+          <p id="task-goal"></p>
+          <p id="task-expectation"></p>
+        </div>
+
+        <div id="info-boxes" class="info-boxes"></div>
+
+        <section class="code-box" id="code-box-main">
+          <h3>Code-In Box: Loesung eingeben</h3>
+          <p class="muted">Schreibe deine Funktion unten und teste direkt im Browser.</p>
+          <textarea id="code-input" spellcheck="false"></textarea>
+          <div class="action-row">
+            <button id="run-tests-btn" class="btn">Tests im Browser ausfuehren</button>
+            <button id="reset-code-btn" class="btn btn-secondary">Code zuruecksetzen</button>
+          </div>
+        </section>
+
+        <section class="result-box" id="result-box">
+          <h3>Testergebnis</h3>
+          <ul id="test-results"></ul>
+        </section>
+      </section>
+    </main>
+
+    <script src="app.js"></script>
+  </body>
+</html>
